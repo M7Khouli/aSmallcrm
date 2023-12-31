@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "mysql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model User {
+  id       String @id @default(uuid())
+  username String
+  password String
+  email    String @unique
+  role     roles
+}
+
+model Product {
+  id      Int    @id @default(autoincrement())
+  name    String
+  photo   String
+  price   Float
+  company String
+  Sale    Sale[]
+}
+
+model Customer {
+  id          Int    @id @default(autoincrement())
+  name        String
+  address     String
+  phoneNumber String
+  Sale        Sale[]
+}
+
+model Sale {
+  id         Int      @id @default(autoincrement())
+  customer   Customer @relation(fields: [customerId], references: [id])
+  product    Product  @relation(fields: [productId], references: [id])
+  quantity   Int
+  totalPrice Float
+  createdAt  DateTime @default(now())
+  customerId Int
+  productId  Int
+}
+
+enum roles {
+  superAdmin
+  admin
+  user
+}

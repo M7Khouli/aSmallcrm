@@ -1,0 +1,31 @@
+{
+  "name": "badrcrmproject",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "prisma": {
+    "schema": "./model/schema.prisma"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx prisma generate &&  nodemon server.js",
+    "prisma:migrate": "dotenv -e config.env npx prisma migrate dev --create-only",
+    "prisma:deploy": "dotenv -e config.env npx prisma migrate deploy"
+  },
+  "author": "Mohammed Al Khouli",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.7.1",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "dotenv-cli": "^7.3.0",
+    "express": "^4.18.2",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "nodemon": "^3.0.2",
+    "prisma": "^5.7.1",
+    "xss": "^1.0.14"
+  }
+}

@@ -6,14 +6,20 @@ const prisma = new PrismaClient();
 const Product = prisma.product;
 
 exports.addProducts = catchAsync((req, res, next) => {
-  if (!req.body.name || !req.body.price || !req.body.company) {
-    next(
-      new AppError(
-        "الرجاء ادخال الاسم والسعر والشركة المصنعة الخاصة بالمنتج",
-        400
-      )
-    );
-  }
+  const productsList = req.body;
+  for (var i = 0; i < productsList.length; i++)
+    if (
+      !productsList[i].name ||
+      !productsList[i].price ||
+      !productsList[i].company
+    ) {
+      next(
+        new AppError(
+          "الرجاء ادخال الاسم والسعر والشركة المصنعة الخاصة بالمنتج",
+          400
+        )
+      );
+    }
   const products = Product.createMany({ data: req.body });
   res
     .status(200)

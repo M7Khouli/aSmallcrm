@@ -12,7 +12,7 @@ router
 
 router
   .route("/:id")
-  .patch(authController.protect, customerController.updateCustomer)
+  .put(authController.protect, customerController.updateCustomer)
   .delete(authController.protect, customerController.deleteCustomer)
   .get(authController.protect, customerController.getCustomer);
 module.exports = router;

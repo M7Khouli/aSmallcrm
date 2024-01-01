@@ -9,6 +9,7 @@ const Product = prisma.product;
 
 exports.addProducts = catchAsync(async (req, res, next) => {
   const product = req.body;
+  console.log(req.body);
   if (!product.name || !product.price || !product.company) {
     return next(
       new AppError(

@@ -1,6 +1,9 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const bodyParser = require("body-parser");
+const multer = require("multer");
+const upload = multer();
 const app = express();
 
 app.use(cors());
@@ -12,9 +15,18 @@ const customersRouter = require("./routes/customerRouter");
 const productsRouter = require("./routes/productRouter");
 const salesRouter = require("./routes/saleRouter");
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // to give extensive about url
 app.use(express.static("public/"));
+
+app.use(bodyParser.json());
+// for parsing application/xwww-form-urlencoded
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
+
+// for parsing multipart/form-data
+app.use(upload.array());
 
 app.use(morgan("dev"));
 

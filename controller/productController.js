@@ -70,7 +70,7 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
   if (!product) {
     next(new AppError("عذرا لا يوجد منتج بهذا المعرف", 400));
   }
-  Product.update({
+  await Product.update({
     where: { id: parseInt(req.params.id) },
     data: req.body,
   });

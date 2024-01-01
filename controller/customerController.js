@@ -35,7 +35,7 @@ exports.getCustomer = catchAsync(async (req, res, next) => {
   const customer = await Customer.findUnique({
     where: { id: parseInt(req.params.id) },
   });
-  if (!customer) {
+  if (customer === null) {
     next(new AppError("عذرا لا يوجد عميل بهذا المعرف", 400));
   }
   res.status(200).json({ status: "success", customer });
@@ -54,7 +54,7 @@ exports.updateCustomer = catchAsync(async (req, res, next) => {
   if (!customer) {
     next(new AppError("عذرا لا يوجد عميل بهذا المعرف", 400));
   }
-  Customer.update({
+  await Customer.update({
     where: { id: parseInt(req.params.id) },
     data: req.body,
   });

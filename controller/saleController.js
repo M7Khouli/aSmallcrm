@@ -4,6 +4,7 @@ const prisma = new PrismaClient();
 const Sale = prisma.sale;
 
 exports.addSaleTransaction = catchAsync(async (req, res, next) => {
+  //if()
   const sale = await Sale.create({ data: req.body });
   res.status(200).json({
     status: "success",

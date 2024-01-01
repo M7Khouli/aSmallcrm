@@ -17,6 +17,7 @@ exports.addProducts = catchAsync(async (req, res, next) => {
       )
     );
   }
+  req.body.price = parseFloat(req.body.price);
   if (req.file) {
     req.body.photo =
       "https://smallcrm.onrender.com/api/products/img/" + req.file.filename;

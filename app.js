@@ -13,6 +13,7 @@ const AppError = require("./utils/appError");
 const userRouter = require("./routes/userRouter");
 const customersRouter = require("./routes/customerRouter");
 const productsRouter = require("./routes/productRouter");
+const employeesRouter = require("./routes/employeeRouter");
 const salesRouter = require("./routes/saleRouter");
 
 app.use(express.static("public/"));
@@ -30,6 +31,7 @@ app.use(morgan("dev"));
 app.use("/api/users", userRouter);
 app.use("/api/customers", customersRouter);
 app.use("/api/products", productsRouter);
+app.use("/api/employees", employeesRouter);
 app.use("/api/sales", salesRouter);
 
 app.all("*", (req, res, next) => {

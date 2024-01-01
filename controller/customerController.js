@@ -7,20 +7,21 @@ const Customer = prisma.customer;
 
 exports.addCustomers = catchAsync(async (req, res, next) => {
   const customersList = req.body;
-  for (var i = 0; i < customersList.length; i++)
+  for (var i = 0; i < customersList.length; i++) {
     if (
       !customersList[i].name ||
       !customersList[i].address ||
       !customersList[i].phoneNumber
     ) {
-      next(
+      return next(
         new AppError(
           "الرجاء ادخال الاسم والعنوان ورقم الهاتف الخاص بالعميل",
           400
         )
       );
     }
-  await Customer.createMany({ data: req.body });
+  }
+  const customers = await Customer.createMany({ data: req.body });
   res
     .status(200)
     .json({ status: "success", message: "تم اضافة العملاء بنجاح" });

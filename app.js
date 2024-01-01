@@ -14,6 +14,7 @@ const salesRouter = require("./routes/saleRouter");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // to give extensive about url
+app.use(express.static("public/"));
 
 app.use(morgan("dev"));
 

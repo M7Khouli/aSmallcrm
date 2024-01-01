@@ -5,7 +5,7 @@ const AppError = require("../utils/appError");
 const prisma = new PrismaClient();
 const Customer = prisma.customer;
 
-exports.addCustomers = catchAsync((req, res, next) => {
+exports.addCustomers = catchAsync(async (req, res, next) => {
   const customersList = req.body;
   for (var i = 0; i < customersList.length; i++)
     if (
@@ -20,7 +20,7 @@ exports.addCustomers = catchAsync((req, res, next) => {
         )
       );
     }
-  const customers = Customer.createMany({ data: req.body });
+  const customers = await Customer.createMany({ data: req.body });
   res
     .status(200)
     .json({ status: "success", message: "تم اضافة العملاء بنجاح" });

@@ -1,11 +1,12 @@
 const { PrismaClient } = require("@prisma/client");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const uploadPhoto = require("../utils/uploadPhoto");
 
 const prisma = new PrismaClient();
 const Product = prisma.product;
 
-exports.addProducts = catchAsync((req, res, next) => {
+exports.addProducts = catchAsync(async (req, res, next) => {
   const productsList = req.body;
   for (var i = 0; i < productsList.length; i++)
     if (
@@ -20,10 +21,29 @@ exports.addProducts = catchAsync((req, res, next) => {
         )
       );
     }
-  const products = Product.createMany({ data: req.body });
+  const products = await Product.createMany({ data: req.body });
   res
     .status(200)
     .json({ status: "success", message: "تم اضافة المنتجات بنجاح" });
+});
+
+exports.addPhoto = catchAsync(async (req, res, next) => {
+  const productsList = req.body;
+  for (var i = 0; i < productsList.length; i++)
+    if (req.body[i].photo) {
+      try {
+        const filename = await uploadPhoto(req.body[i].photo);
+        req.body[i].photo =
+          "https://smallcrm.onrender.com/api/products/img/" + filename;
+      } catch (err) {
+        req.body[i].photo =
+          "https://smallcrm.onrender.com/api/products/img/default-image.jpg";
+      }
+    } else {
+      req.body[i].photo =
+        "https://smallcrm.onrender.com/api/products/img/default-image.jpg";
+    }
+  next();
 });
 
 exports.getAllProducts = catchAsync(async (req, res, next) => {
@@ -40,6 +60,7 @@ exports.getProduct = catchAsync(async (req, res, next) => {
   }
   res.status(200).json({ status: "success", product });
 });
+exports.getImage = catchAsync(async (req, res, next) => {});
 
 exports.updateProduct = catchAsync(async (req, res, next) => {
   if (!req.body.name && !req.body.price && !req.body.company) {

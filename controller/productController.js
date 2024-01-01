@@ -9,7 +9,7 @@ const Product = prisma.product;
 exports.addProducts = catchAsync(async (req, res, next) => {
   const product = req.body;
   if (!product.name || !product.price || !product.company)
-    next(
+    return next(
       new AppError(
         "الرجاء ادخال الاسم والسعر والشركة المصنعة الخاصة بالمنتج",
         400
@@ -48,7 +48,7 @@ exports.getProduct = catchAsync(async (req, res, next) => {
     where: { id: parseInt(req.params.id) },
   });
   if (!product) {
-    next(new AppError("عذرا لا يوجد منتج بهذا المعرف", 400));
+    return next(new AppError("عذرا لا يوجد منتج بهذا المعرف", 400));
   }
   res.status(200).json({ status: "success", product });
 });
@@ -56,7 +56,7 @@ exports.getImage = catchAsync(async (req, res, next) => {});
 
 exports.updateProduct = catchAsync(async (req, res, next) => {
   if (!req.body.name && !req.body.price && !req.body.company) {
-    next(
+    return next(
       new AppError(
         "الرجاء ادخال الاسم او السعر او الشركة المراد تعديلها للمنتج",
         400
@@ -68,7 +68,7 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
     where: { id: parseInt(req.params.id) },
   });
   if (!product) {
-    next(new AppError("عذرا لا يوجد منتج بهذا المعرف", 400));
+    return next(new AppError("عذرا لا يوجد منتج بهذا المعرف", 400));
   }
   await Product.update({
     where: { id: parseInt(req.params.id) },
@@ -84,7 +84,7 @@ exports.deleteProduct = catchAsync(async (req, res, next) => {
     where: { id: parseInt(req.params.id) },
   });
   if (!product) {
-    next(new AppError("عذرا لا يوجد منتج بهذا المعرف", 400));
+    return next(new AppError("عذرا لا يوجد منتج بهذا المعرف", 400));
   }
   await Product.delete({ where: { id: parseInt(req.params.id) } });
   res.status(200).json({ status: "success", message: "تم حذف المنتج بنجاح" });

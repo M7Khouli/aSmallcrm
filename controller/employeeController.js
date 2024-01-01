@@ -3,74 +3,63 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
 const prisma = new PrismaClient();
-const Customer = prisma.customer;
+const Employee = prisma.employee;
 
-exports.addCustomers = catchAsync(async (req, res, next) => {
-  const customersList = req.body;
-  for (var i = 0; i < customersList.length; i++) {
-    if (
-      !customersList[i].name ||
-      !customersList[i].address ||
-      !customersList[i].phoneNumber
-    ) {
-      return next(
-        new AppError(
-          "الرجاء ادخال الاسم والعنوان ورقم الهاتف الخاص بالعميل",
-          400
-        )
-      );
-    }
+exports.addEmployee = catchAsync(async (req, res, next) => {
+  const employee = req.body;
+  if (!employee.name || !employee.address || !employee.phoneNumber) {
+    return next(
+      new AppError("الرجاء ادخال الاسم والعنوان ورقم الهاتف الخاص بالموظف", 400)
+    );
   }
-  const customers = await Customer.createMany({ data: req.body });
-  res
-    .status(200)
-    .json({ status: "success", message: "تم اضافة العملاء بنجاح" });
+  await Employee.createMany({ data: req.body });
+  res.status(200).json({ status: "success", message: "تم اضافة الموظف بنجاح" });
 });
 
-exports.getAllCustomers = catchAsync(async (req, res, next) => {
-  const customers = await Customer.findMany();
-  res.status(200).json({ status: "success", customers });
+exports.getAllEmployees = catchAsync(async (req, res, next) => {
+  const employees = await Employee.findMany();
+  res.status(200).json({ status: "success", employees });
 });
 
-exports.getCustomer = catchAsync(async (req, res, next) => {
-  const customer = await Customer.findUnique({
+exports.getEmployee = catchAsync(async (req, res, next) => {
+  const employee = await Employee.findUnique({
     where: { id: parseInt(req.params.id) },
   });
-  if (customer === null) {
-    return next(new AppError("عذرا لا يوجد عميل بهذا المعرف", 400));
+  if (employee === null) {
+    return next(new AppError("عذرا لا يوجد موظف بهذا المعرف", 400));
   }
-  res.status(200).json({ status: "success", customer });
+  res.status(200).json({ status: "success", employee });
 });
 
-exports.updateCustomer = catchAsync(async (req, res, next) => {
+exports.updateEmployee = catchAsync(async (req, res, next) => {
   if (!req.body.name && !req.body.address && !req.body.phoneNumber) {
     return next(
-      new AppError("الرجاء ادخال الاسم والعنوان ورقم الهاتف الخاص بالعميل", 400)
+      new AppError("الرجاء ادخال الاسم والعنوان ورقم الهاتف الخاص بالموظف", 400)
     );
   }
 
-  const customer = await Customer.findUnique({
+  const employee = await Employee.findUnique({
     where: { id: parseInt(req.params.id) },
   });
-  if (!customer) {
-    return next(new AppError("عذرا لا يوجد عميل بهذا المعرف", 400));
+  if (!employee) {
+    return next(new AppError("عذرا لا يوجد موظف بهذا المعرف", 400));
   }
-  await Customer.update({
+  await Employee.update({
     where: { id: parseInt(req.params.id) },
     data: req.body,
   });
   res
     .status(200)
-    .json({ status: "success", message: "تم تحديث بيانات العميل بنجاح" });
+    .json({ status: "success", message: "تم تحديث بيانات الموظف بنجاح" });
 });
 
-exports.deleteCustomer = catchAsync(async (req, res, next) => {
-  const customer = await Customer.findUnique({
+exports.deleteEmployee = catchAsync(async (req, res, next) => {
+  const employee = await Employee.findUnique({
     where: { id: parseInt(req.params.id) },
   });
-  if (!customer) {
-    return next(new AppError("عذرا لا يوجد عميل بهذا المعرف", 400));
+  if (!employee) {
+    return next(new AppError("عذرا لا يوجد موظف بهذا المعرف", 400));
   }
-  await Customer.delete({ where: { id: parseInt(req.params.id) } });
-  res.status(200).json({ status: "success", message: "تم حذف العميل بنجاح" });
+  await Employee.delete({ where: { id: parseInt(req.params.id) } });
+  res.status(200).json({ status: "success", message: "تم حذف الموظف بنجاح" });
 });

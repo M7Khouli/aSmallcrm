@@ -9,7 +9,6 @@ const Product = prisma.product;
 
 exports.addProducts = catchAsync(async (req, res, next) => {
   const product = req.body;
-  console.log(product);
   if (!product.name || !product.price || !product.company) {
     return next(
       new AppError(
@@ -17,6 +16,13 @@ exports.addProducts = catchAsync(async (req, res, next) => {
         400
       )
     );
+  }
+  if (req.file) {
+    req.body.photo =
+      "https://smallcrm.onrender.com/api/products/img/" + req.file.filename;
+  } else {
+    req.body.photo =
+      "https://smallcrm.onrender.com/api/products/img/default-image.jpg";
   }
   await Product.create({ data: req.body });
   res

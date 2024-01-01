@@ -11,7 +11,7 @@ router
   .get(authController.protect, productController.getAllProducts)
   .post(
     authController.protect,
-    productController.addPhoto,
+    upload.single("photo"),
     productController.addProducts
   );
 

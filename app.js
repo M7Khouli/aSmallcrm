@@ -25,9 +25,6 @@ app.use(
   })
 );
 
-// for parsing multipart/form-data
-app.use(upload.array());
-
 app.use(morgan("dev"));
 
 app.use("/api/users", userRouter);

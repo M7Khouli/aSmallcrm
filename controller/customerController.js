@@ -20,7 +20,7 @@ exports.addCustomers = catchAsync(async (req, res, next) => {
         )
       );
     }
-  const customers = await Customer.createMany({ data: req.body });
+  await Customer.createMany({ data: req.body });
   res
     .status(200)
     .json({ status: "success", message: "تم اضافة العملاء بنجاح" });

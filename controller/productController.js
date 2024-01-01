@@ -7,42 +7,34 @@ const prisma = new PrismaClient();
 const Product = prisma.product;
 
 exports.addProducts = catchAsync(async (req, res, next) => {
-  const productsList = req.body;
-  for (var i = 0; i < productsList.length; i++)
-    if (
-      !productsList[i].name ||
-      !productsList[i].price ||
-      !productsList[i].company
-    ) {
-      next(
-        new AppError(
-          "الرجاء ادخال الاسم والسعر والشركة المصنعة الخاصة بالمنتج",
-          400
-        )
-      );
-    }
-  const products = await Product.createMany({ data: req.body });
+  const product = req.body;
+  if (!product.name || !product.price || !product.company)
+    next(
+      new AppError(
+        "الرجاء ادخال الاسم والسعر والشركة المصنعة الخاصة بالمنتج",
+        400
+      )
+    );
+  await Product.createMany({ data: req.body });
   res
     .status(200)
     .json({ status: "success", message: "تم اضافة المنتجات بنجاح" });
 });
 
 exports.addPhoto = catchAsync(async (req, res, next) => {
-  const productsList = req.body;
-  for (var i = 0; i < productsList.length; i++)
-    if (req.body[i].photo) {
-      try {
-        const filename = await uploadPhoto(req.body[i].photo);
-        req.body[i].photo =
-          "https://smallcrm.onrender.com/api/products/img/" + filename;
-      } catch (err) {
-        req.body[i].photo =
-          "https://smallcrm.onrender.com/api/products/img/default-image.jpg";
-      }
-    } else {
-      req.body[i].photo =
+  if (req.body.photo) {
+    try {
+      const filename = await uploadPhoto(req.body.photo);
+      req.body.photo =
+        "https://smallcrm.onrender.com/api/products/img/" + filename;
+    } catch (err) {
+      req.body.photo =
         "https://smallcrm.onrender.com/api/products/img/default-image.jpg";
     }
+  } else {
+    req.body.photo =
+      "https://smallcrm.onrender.com/api/products/img/default-image.jpg";
+  }
   next();
 });
 

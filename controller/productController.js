@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+const path = require("path");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const uploadPhoto = require("../utils/uploadPhoto");
@@ -8,14 +9,15 @@ const Product = prisma.product;
 
 exports.addProducts = catchAsync(async (req, res, next) => {
   const product = req.body;
-  if (!product.name || !product.price || !product.company)
+  if (!product.name || !product.price || !product.company) {
     return next(
       new AppError(
         "الرجاء ادخال الاسم والسعر والشركة المصنعة الخاصة بالمنتج",
         400
       )
     );
-  await Product.createMany({ data: req.body });
+  }
+  await Product.create({ data: req.body });
   res
     .status(200)
     .json({ status: "success", message: "تم اضافة المنتجات بنجاح" });
@@ -52,7 +54,9 @@ exports.getProduct = catchAsync(async (req, res, next) => {
   }
   res.status(200).json({ status: "success", product });
 });
-exports.getImage = catchAsync(async (req, res, next) => {});
+exports.getImage = catchAsync(async (req, res, next) => {
+  res.sendFile(path.resolve("public/img/" + req.params.id));
+});
 
 exports.updateProduct = catchAsync(async (req, res, next) => {
   if (!req.body.name && !req.body.price && !req.body.company) {

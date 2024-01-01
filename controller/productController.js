@@ -27,7 +27,7 @@ exports.addProducts = catchAsync(async (req, res, next) => {
 exports.addPhoto = catchAsync(async (req, res, next) => {
   if (req.body.photo) {
     try {
-      const filename = await uploadPhoto(req.body.photo);
+      const filename = await uploadPhoto(req.body.photo).single("photo");
       req.body.photo =
         "https://smallcrm.onrender.com/api/products/img/" + filename;
     } catch (err) {

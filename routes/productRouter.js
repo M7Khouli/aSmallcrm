@@ -11,7 +11,7 @@ router
   .get(authController.protect, productController.getAllProducts)
   .post(
     authController.protect,
-    upload.fields([{ name: "photo", maxCount: 1 }]),
+    productController.addPhoto,
     productController.addProducts
   );
 

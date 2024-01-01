@@ -4,13 +4,14 @@ const router = express.Router();
 
 const authController = require("../controller/authController.js");
 const productController = require("../controller/productController.js");
+const upload = require("../utils/uploadPhoto.js");
 
 router
   .route("/")
   .get(authController.protect, productController.getAllProducts)
   .post(
     authController.protect,
-    productController.addPhoto,
+    upload.fields([{ name: "photo", maxCount: 1 }]),
     productController.addProducts
   );
 

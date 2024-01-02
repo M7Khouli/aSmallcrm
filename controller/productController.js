@@ -1,11 +1,13 @@
 const { PrismaClient } = require("@prisma/client");
 const path = require("path");
+const fs = require("fs");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const uploadPhoto = require("../utils/uploadPhoto");
 
 const prisma = new PrismaClient();
 const Product = prisma.product;
+const Sale = prisma.sale;
 
 exports.addProducts = catchAsync(async (req, res, next) => {
   const product = req.body;
@@ -98,6 +100,18 @@ exports.deleteProduct = catchAsync(async (req, res, next) => {
   if (!product) {
     return next(new AppError("عذرا لا يوجد منتج بهذا المعرف", 400));
   }
+  if (
+    product.photo !==
+    "https://smallcrm.onrender.com/api/products/img/default-image.jpg"
+  ) {
+    const substringAfterImg = product.photo.substring(
+      product.photo.lastIndexOf("img/") + 4
+    );
+    fs.unlink("public/img/" + substringAfterImg, (err) => {
+      if (err) console.log(err);
+    });
+  }
+  await Sale.deleteMany({ where: { productId: parseInt(req.params.id) } });
   await Product.delete({ where: { id: parseInt(req.params.id) } });
   res.status(200).json({ status: "success", message: "تم حذف المنتج بنجاح" });
 });

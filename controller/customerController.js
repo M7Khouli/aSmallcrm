@@ -4,6 +4,7 @@ const AppError = require("../utils/appError");
 
 const prisma = new PrismaClient();
 const Customer = prisma.customer;
+const Sale = prisma.sale;
 
 exports.addCustomers = catchAsync(async (req, res, next) => {
   const customersList = req.body;
@@ -71,6 +72,7 @@ exports.deleteCustomer = catchAsync(async (req, res, next) => {
   if (!customer) {
     return next(new AppError("عذرا لا يوجد عميل بهذا المعرف", 400));
   }
+  await Sale.deleteMany({ where: { customerId: parseInt(req.params.id) } });
   await Customer.delete({ where: { id: parseInt(req.params.id) } });
   res.status(200).json({ status: "success", message: "تم حذف العميل بنجاح" });
 });

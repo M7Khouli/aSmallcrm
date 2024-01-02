@@ -45,7 +45,8 @@ exports.getAllSaleTransaction = catchAsync(async (req, res, next) => {
     await prisma.$queryRaw`SELECT s.id,s.createdAt,s.totalPrice,s.quantity, c.name AS customerName, p.name AS productName
         FROM Sale s
         INNER JOIN Customer c ON s.customerId = c.id
-        INNER JOIN Product p ON s.productId = p.id`;
+        INNER JOIN Product p ON s.productId = p.id
+        ORDER by s.id DESC`;
   res.status(200).json({
     status: "success",
     sales,

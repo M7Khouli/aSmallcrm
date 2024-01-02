@@ -1,6 +1,6 @@
 const dotEnv = require("dotenv");
 
-dotEnv.config({ path: "./.env" });
+dotEnv.config({ path: ".env" });
 
 process.on("uncaughtException", (err) => {
   console.log("Unhandled Exception!!!💥💥 shutting down....");

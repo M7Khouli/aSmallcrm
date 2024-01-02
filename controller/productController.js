@@ -12,6 +12,11 @@ const Sale = prisma.sale;
 exports.addProducts = catchAsync(async (req, res, next) => {
   const product = req.body;
   if (!product.name || !product.price || !product.company) {
+    if (req.file) {
+      fs.unlink("public/img/" + req.file.filename, (err) => {
+        if (err) console.log(err);
+      });
+    }
     return next(
       new AppError(
         "الرجاء ادخال الاسم والسعر والشركة المصنعة الخاصة بالمنتج",

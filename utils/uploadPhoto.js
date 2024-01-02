@@ -1,5 +1,6 @@
 const multer = require("multer");
 const path = require("path");
+const AppError = require("../utils/appError");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -16,11 +17,7 @@ const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
   } else {
-    cb(
-      new Error(
-        "عذرا , يسمح فقط بالصور سيتم استبدال الصورة المرفقة بالصورة الافتراضية"
-      )
-    );
+    cb(new AppError("عذرا , صيغة الصورة غير صحيحة", 400));
   }
 };
 

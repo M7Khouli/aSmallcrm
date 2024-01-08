@@ -21,15 +21,6 @@ exports.addSaleTransaction = catchAsync(async (req, res, next) => {
   if (!product) {
     return next(new AppError("الرجاء ادخل معرف صحيح للمنتج", 400));
   }
-
-  const customer = await Customer.findUnique({
-    where: { id: req.body.customerId },
-  });
-
-  if (!customer) {
-    return next(new AppError("الرجاء ادخل معرف صحيح للزبون", 400));
-  }
-
   req.body.totalPrice =
     parseFloat(req.body.quantity) * parseFloat(product.price);
   const sale = await Sale.create({ data: req.body });
@@ -41,12 +32,60 @@ exports.addSaleTransaction = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllSaleTransaction = catchAsync(async (req, res, next) => {
-  const sales =
-    await prisma.$queryRaw`SELECT s.id,s.createdAt,s.totalPrice,s.quantity, c.name AS customerName, p.name AS productName
-        FROM Sale s
-        INNER JOIN Customer c ON s.customerId = c.id
-        INNER JOIN Product p ON s.productId = p.id
-        ORDER by s.id DESC`;
+  const page = req.query.page * 1 || 1;
+  const limit = 10;
+  const skip = (page - 1) * limit;
+  Object.keys(req.query).forEach((el) => {
+    if (
+      el !== "customerName" &&
+      (el !== "productName") & (el !== "totalPrice") &&
+      el !== "quantity"
+    )
+      delete req.query[el];
+    else {
+      if (el === "totalPrice" || el === "quantity") {
+        if (isNaN(req.query[el]))
+          return next(
+            new AppError("please provide a valid totalPrice or quantity", 400)
+          );
+        if (el === "totalPrice") {
+          req.query[el] = {
+            equals: parseFloat(req.query[el]),
+          };
+        } else {
+          req.query[el] = {
+            equals: parseInt(req.query[el]),
+          };
+        }
+      } else {
+        req.query[el] = {
+          contains: req.query[el],
+        };
+      }
+    }
+  });
+  const sales = await Sale.findMany({
+    include: {
+      product: {
+        select: {
+          name: true,
+        },
+      },
+      customer: {
+        select: {
+          name: true,
+        },
+      },
+    },
+    where: {
+      quantity: req.query.quantity,
+      totalPrice: req.query.totalPrice,
+      customer: { name: req.query.customerName },
+      product: { name: req.query.productName },
+    },
+    skip,
+    take: limit,
+  });
   res.status(200).json({
     status: "success",
     sales,
@@ -54,12 +93,6 @@ exports.getAllSaleTransaction = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteSale = catchAsync(async (req, res, next) => {
-  const sale = await Sale.findUnique({
-    where: { id: parseInt(req.params.id) },
-  });
-  if (!sale) {
-    return next(new AppError("عذرا لا يوجد عملية بيع بهذا المعرف", 400));
-  }
   await Sale.delete({ where: { id: parseInt(req.params.id) } });
   res
     .status(200)

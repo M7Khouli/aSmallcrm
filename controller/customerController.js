@@ -22,14 +22,30 @@ exports.addCustomers = catchAsync(async (req, res, next) => {
       );
     }
   }
-  const customers = await Customer.createMany({ data: req.body });
+  await Customer.createMany({ data: req.body });
   res
     .status(200)
     .json({ status: "success", message: "تم اضافة العملاء بنجاح" });
 });
 
 exports.getAllCustomers = catchAsync(async (req, res, next) => {
-  const customers = await Customer.findMany();
+  const page = req.query.page * 1 || 1;
+  const limit = 10;
+  const skip = (page - 1) * limit;
+  Object.keys(req.query).forEach((el) => {
+    if (el !== "name" && (el !== "phoneNumber") & (el !== "address"))
+      delete req.query[el];
+    else {
+      req.query[el] = {
+        contains: req.query[el],
+      };
+    }
+  });
+  const customers = await Customer.findMany({
+    where: req.query,
+    skip,
+    take: limit,
+  });
   res.status(200).json({ status: "success", customers });
 });
 
@@ -49,13 +65,9 @@ exports.updateCustomer = catchAsync(async (req, res, next) => {
       new AppError("الرجاء ادخال الاسم والعنوان ورقم الهاتف الخاص بالعميل", 400)
     );
   }
-
   const customer = await Customer.findUnique({
     where: { id: parseInt(req.params.id) },
   });
-  if (!customer) {
-    return next(new AppError("عذرا لا يوجد عميل بهذا المعرف", 400));
-  }
   await Customer.update({
     where: { id: parseInt(req.params.id) },
     data: req.body,

@@ -56,7 +56,31 @@ exports.addPhoto = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllProducts = catchAsync(async (req, res, next) => {
-  const products = await Product.findMany();
+  const page = req.query.page * 1 || 1;
+  const limit = 10;
+  const skip = (page - 1) * limit;
+  Object.keys(req.query).forEach((el) => {
+    if (el !== "name" && (el !== "company") & (el !== "price"))
+      delete req.query[el];
+    else {
+      if (el === "price") {
+        if (isNaN(req.query[el]))
+          return next(new AppError("please provide a valid price", 400));
+        req.query[el] = {
+          equals: parseFloat(req.query[el]),
+        };
+      } else {
+        req.query[el] = {
+          contains: req.query[el],
+        };
+      }
+    }
+  });
+  const products = await Product.findMany({
+    where: req.query,
+    skip,
+    take: limit,
+  });
   res.status(200).json({ status: "success", products });
 });
 
@@ -81,13 +105,6 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
         400
       )
     );
-  }
-
-  const product = await Product.findUnique({
-    where: { id: parseInt(req.params.id) },
-  });
-  if (!product) {
-    return next(new AppError("عذرا لا يوجد منتج بهذا المعرف", 400));
   }
   await Product.update({
     where: { id: parseInt(req.params.id) },

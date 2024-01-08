@@ -21,6 +21,17 @@ const handelFalsePhotoError = (err) => {
   return new AppError("لاتوجد صورة على هذا الرابط", 400);
 };
 
+const handleMissingFieldDB = (err) => {
+  return new AppError("الرجاء ادخال المعلومات في جميع الحقول", 400);
+};
+
+const handleFalseRecordDB = (err) => {
+  return new AppError(
+    "خطأ , لم يتم ايجاد المعرف المطلوب في قاعدة البيانات الرجاء التحقق منه والمحاولة لاحقا",
+    400
+  );
+};
+
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -57,7 +68,10 @@ module.exports = (err, req, res, next) => {
     if (err.name === "TokenExpiredError") error = handelTokenExpireError();
     if (err.name === "JsonWebTokenError") error = handleTokenInvalidError();
     if (err.errno === -2) error = handelFalsePhotoError();
-
+    if (err.code === "P2025") error = handleFalseRecordDB();
+    if (err.code === "P2014") error = handleMissingFieldDB();
+    if (err.code === "P2003")
+      error = new AppError("خطا في معرف الزبون يرجى المحاولة لاحقا", 400);
     sendErrorProd(error, res);
   }
 };
